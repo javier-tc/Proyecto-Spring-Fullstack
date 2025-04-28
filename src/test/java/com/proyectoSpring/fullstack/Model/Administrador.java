@@ -1,4 +1,4 @@
-package com.proyectoSpring.fullstack.Clases;
+package com.proyectoSpring.fullstack.Model;
 
 import java.util.ArrayList;
 import java.util.List;
