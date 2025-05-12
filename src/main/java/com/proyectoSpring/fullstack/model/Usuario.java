@@ -6,7 +6,9 @@ import java.util.Set;
 
 @Data
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuarios", uniqueConstraints = {
+    @UniqueConstraint(columnNames = "email")
+})
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +38,7 @@ public class Usuario {
     )
     private Set<Rol> roles;
 
+    @Column(nullable = false)
     private boolean activo = true;
 }
 
