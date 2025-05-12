@@ -1,5 +1,47 @@
-HELP.md
+# Environment variables
+.env
+.env.*
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# Compiled files
 target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Logs
+logs/
+*.log
+
+# Database
+*.db
+*.sql
+*.sqlite
+
+# Uploaded files
+uploads/
+
+# Maven
+.mvn/
+mvnw
+mvnw.cmd
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Spring Boot
+spring-boot-devtools.restart.trigger
+spring-boot-devtools.restart.enabled
+
+HELP.md
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -13,12 +55,6 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
@@ -28,6 +64,3 @@ target/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
-
-### VS Code ###
-.vscode/

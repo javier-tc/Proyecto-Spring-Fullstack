@@ -2,6 +2,9 @@ package com.proyectoSpring.fullstack.controller;
 
 import com.proyectoSpring.fullstack.model.Usuario;
 import com.proyectoSpring.fullstack.service.UsuarioService;
+import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,16 +14,26 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
+    private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
     private final UsuarioService usuarioService;
 
     @Autowired
     public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
+        logger.info("UsuarioController inicializado");
+    }
+
+    @PostConstruct
+    public void init() {
+        logger.info("UsuarioController registrado en el contexto de Spring");
     }
 
     @GetMapping
     public List<Usuario> getAllUsuarios() {
-        return usuarioService.findAll();
+        logger.info("Obteniendo todos los usuarios");
+        List<Usuario> usuarios = usuarioService.findAll();
+        logger.info("Se encontraron {} usuarios", usuarios.size());
+        return usuarios;
     }
 
     @GetMapping("/{id}")

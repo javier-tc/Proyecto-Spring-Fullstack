@@ -1,10 +1,16 @@
 package com.proyectoSpring.fullstack.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "usuarios", uniqueConstraints = {
     @UniqueConstraint(columnNames = "email")
@@ -26,10 +32,6 @@ public class Usuario {
     @Column(nullable = false)
     private String apellido;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TipoUsuario tipoUsuario;
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "usuario_roles",
@@ -40,10 +42,4 @@ public class Usuario {
 
     @Column(nullable = false)
     private boolean activo = true;
-}
-
-enum TipoUsuario {
-    CLIENTE,
-    EMPLEADO,
-    GERENTE
 } 
