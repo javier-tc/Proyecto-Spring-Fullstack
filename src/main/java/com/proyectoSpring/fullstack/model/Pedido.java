@@ -41,7 +41,23 @@ public class Pedido {
     @JoinColumn(name = "sucursal_id")
     private Sucursal sucursal;
 
+    @ManyToOne
+    @JoinColumn(name = "ruta_id")
+    private RutaEntrega ruta;
+
     private String observaciones;
+
+    @PrePersist
+    protected void onCreate() {
+        fechaCreacion = LocalDateTime.now();
+        fechaActualizacion = LocalDateTime.now();
+        estado = EstadoPedido.PENDIENTE;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        fechaActualizacion = LocalDateTime.now();
+    }
 }
 
 enum EstadoPedido {

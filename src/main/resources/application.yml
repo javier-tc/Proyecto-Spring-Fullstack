@@ -38,6 +38,11 @@ spring:
           starttls:
             enable: true
 
+# Configuración JWT
+jwt:
+  secret: ${JWT_SECRET:tu_clave_secreta_muy_segura_para_el_token_jwt_debe_ser_muy_larga_y_segura}
+  expiration: ${JWT_EXPIRATION:86400000} # 24 horas en milisegundos
+
 server:
   port: 8080
   error:

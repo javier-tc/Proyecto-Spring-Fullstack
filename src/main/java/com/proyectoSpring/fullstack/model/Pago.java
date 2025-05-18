@@ -14,35 +14,34 @@ public class Pago {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "pedido_id")
+    @JoinColumn(name = "pedido_id", nullable = false)
     private Pedido pedido;
 
-    @Column(nullable = false)
+    @Column(name = "numero_transaccion", nullable = false)
     private String numeroTransaccion;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal monto;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "metodo_pago", nullable = false)
     private MetodoPago metodoPago;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EstadoPago estado;
 
-    @Column(nullable = false)
+    @Column(name = "fecha_pago", nullable = false)
     private LocalDateTime fechaPago;
 
+    @Column(name = "detalles_transaccion")
     private String detallesTransaccion;
-}
 
-enum MetodoPago {
-    TARJETA_CREDITO,
-    TARJETA_DEBITO,
-    PAYPAL,
-    WEBPAY,
-    TRANSFERENCIA
+    @PrePersist
+    protected void onCreate() {
+        fechaPago = LocalDateTime.now();
+        estado = EstadoPago.PENDIENTE;
+    }
 }
 
 enum EstadoPago {

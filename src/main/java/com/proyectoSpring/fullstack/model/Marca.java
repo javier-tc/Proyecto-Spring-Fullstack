@@ -5,8 +5,8 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "permisos")
-public class Permiso {
+@Table(name = "marcas")
+public class Marca {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -16,7 +16,9 @@ public class Permiso {
 
     private String descripcion;
 
-    @Enumerated(EnumType.STRING)
+    @Column(name = "url_logo")
+    private String logo;
+
     @Column(nullable = false)
-    private TipoPermiso tipo;
+    private boolean activa = true;
 } 

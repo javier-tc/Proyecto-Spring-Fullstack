@@ -1,106 +1,427 @@
-# Arquitectura del Sistema
+# Perfulandia - Sistema de Gestión de Perfumería
 
-## Estructura de Modelos
+## Descripción
+Sistema de gestión integral para una perfumería, desarrollado con Spring Boot y React. El sistema maneja usuarios, productos, ventas, inventario y más.
 
-Hemos creado modelos para diferentes aspectos del sistema:
+## Tecnologías Utilizadas
+- Backend:
+  - Java 17
+  - Spring Boot 3.x
+  - Spring Security con JWT
+  - MySQL 8.x
+  - Maven
+  - JPA/Hibernate
 
-- **Usuario**: Maneja clientes, empleados y gerentes  
-- **Rol y Permiso**: Sistema de autorización  
-- **Producto y Categoría**: Gestión de inventario  
-- **Pedido y DetallePedido**: Procesamiento de pedidos  
-- **Pago**: Gestión de pagos  
-- **Sucursal**: Gestión de ubicaciones  
+## Estructura del Proyecto
 
----
+### Modelos de Datos
 
-## Configuración Actual
+#### Usuario y Autenticación
+- **Usuario**
+  - id (Long)
+  - email (String, único)
+  - password (String)
+  - nombre (String)
+  - apellido (String)
+  - roles (Set<Rol>)
+  - activo (boolean)
 
-- **Framework**: Spring Boot  
-- **Base de Datos Principal**: PostgreSQL  
-- **Base de Datos NoSQL**: MongoDB (para datos flexibles como pedidos)  
-- **Autenticación**: JWT  
-- **Mensajería**: Kafka  
+- **Rol**
+  - id (Long)
+  - nombre (TipoRol enum)
+  - permisos (Set<Permiso>)
+  - descripcion (String)
 
----
+- **Permiso**
+  - id (Long)
+  - nombre (String, único)
+  - descripcion (String)
+  - tipo (TipoPermiso enum)
 
-## Plan para Microservicios
+#### Catálogo y Productos
+- **Producto**
+  - id (Long)
+  - nombre (String)
+  - codigo (String)
+  - descripcion (String)
+  - precio (BigDecimal)
+  - stock (Integer)
+  - stockMinimo (Integer)
+  - categoria (Categoria)
+  - sucursal (Sucursal)
+  - activo (boolean)
 
-Cada modelo se convertirá en un microservicio independiente:
+- **Categoria**
+  - id (Long)
+  - nombre (String, único)
+  - descripcion (String)
+  - activo (boolean)
 
-### Servicio de Autenticación
+#### Gestión de Sucursales
+- **Sucursal**
+  - id (Long)
+  - nombre (String)
+  - direccion (String)
+  - telefono (String)
+  - email (String)
+  - activa (boolean)
 
-- Maneja usuarios, roles y permisos  
-- Proporciona tokens JWT  
-- Comunicación vía REST  
+- **Inventario**
+  - id (Long)
+  - sucursal (Sucursal)
+  - producto (Producto)
+  - cantidad (Integer)
+  - stockMinimo (Integer)
+  - stockMaximo (Integer)
+  - ubicacionEstante (String)
 
-### Servicio de Inventario
+#### Ventas y Pedidos
+- **Pedido**
+  - id (Long)
+  - numeroPedido (String)
+  - cliente (Usuario)
+  - fechaCreacion (LocalDateTime)
+  - fechaActualizacion (LocalDateTime)
+  - estado (EstadoPedido enum)
+  - detalles (List<DetallePedido>)
+  - total (BigDecimal)
+  - sucursal (Sucursal)
+  - observaciones (String)
 
-- Gestiona productos y categorías  
-- Control de stock  
-- Usa PostgreSQL  
-- Comunicación vía REST y Kafka para notificaciones  
+- **DetallePedido**
+  - id (Long)
+  - pedido (Pedido)
+  - producto (Producto)
+  - cantidad (Integer)
+  - precioUnitario (BigDecimal)
+  - subtotal (BigDecimal)
 
-### Servicio de Pedidos
+- **Factura**
+  - id (Long)
+  - numeroFactura (String, único)
+  - pedido (Pedido)
+  - cliente (Usuario)
+  - fechaEmision (LocalDateTime)
+  - subtotal (double)
+  - impuestos (double)
+  - descuentos (double)
+  - total (double)
+  - estado (EstadoFactura enum)
+  - detalles (List<DetalleFactura>)
+  - rutaArchivoPDF (String)
+  - rutaArchivoXML (String)
 
-- Procesa pedidos  
-- Usa MongoDB para mayor flexibilidad  
-- Se comunica con servicios de inventario y pagos  
-- Usa Kafka para eventos  
+#### Carrito de Compras
+- **CarritoCompra**
+  - id (Long)
+  - usuario (Usuario)
+  - items (List<ItemCarrito>)
+  - fechaCreacion (LocalDateTime)
+  - fechaActualizacion (LocalDateTime)
+  - codigoPromocional (String)
+  - subtotal (BigDecimal)
+  - descuento (BigDecimal)
+  - total (BigDecimal)
 
-### Servicio de Pagos
+- **ItemCarrito**
+  - id (Long)
+  - carrito (CarritoCompra)
+  - producto (Producto)
+  - cantidad (Integer)
+  - precioUnitario (BigDecimal)
+  - subtotal (BigDecimal)
 
-- Integración con pasarelas de pago  
-- Gestión de transacciones  
-- Comunicación vía REST y webhooks  
+#### Promociones y Pagos
+- **CodigoPromocional**
+  - id (Long)
+  - codigo (String, único)
+  - descripcion (String)
+  - tipoDescuento (TipoDescuento enum)
+  - valorDescuento (double)
+  - montoMinimoCompra (double)
+  - fechaInicio (LocalDateTime)
+  - fechaFin (LocalDateTime)
+  - activo (boolean)
+  - usosMaximos (int)
+  - usosActuales (int)
+  - creadoPor (Usuario)
+  - fechaCreacion (LocalDateTime)
 
-### Servicio de Notificaciones
+- **Pago**
+  - id (Long)
+  - pedido (Pedido)
+  - numeroTransaccion (String)
+  - monto (BigDecimal)
+  - metodoPago (MetodoPago enum)
+  - estado (EstadoPago enum)
+  - fechaPago (LocalDateTime)
+  - detallesTransaccion (String)
 
-- Envía emails, SMS y notificaciones push  
-- Usa RabbitMQ para colas de mensajes  
-- Comunicación con todos los servicios  
+#### Sistema de Notificaciones
+- **Notificacion**
+  - id (Long)
+  - usuario (Usuario)
+  - tipo (TipoNotificacion enum)
+  - mensaje (String)
+  - leido (boolean)
+  - fechaCreacion (LocalDateTime)
+  - fechaLectura (LocalDateTime)
 
----
+#### Reportes
+- **Reporte**
+  - id (Long)
+  - tipo (TipoReporte enum)
+  - generadoPor (Usuario)
+  - fechaGeneracion (LocalDateTime)
+  - rutaArchivo (String)
+  - formato (String)
+  - parametros (String)
 
-## Integración entre Microservicios
+### Enums
+- **TipoRol**: CLIENTE, EMPLEADO_VENTAS, EMPLEADO_LOGISTICA, GERENTE_SUCURSAL, ADMINISTRADOR
+- **TipoPermiso**: LECTURA, ESCRITURA, ELIMINACION, ADMINISTRACION
+- **EstadoPedido**: PENDIENTE, CONFIRMADO, EN_PREPARACION, ENVIADO, ENTREGADO, CANCELADO
+- **EstadoFactura**: EMITIDA, ANULADA, PAGADA, VENCIDA
+- **TipoDescuento**: PORCENTAJE, MONTO_FIJO
+- **MetodoPago**: TARJETA_CREDITO, TARJETA_DEBITO, PAYPAL, WEBPAY, TRANSFERENCIA
+- **EstadoPago**: PENDIENTE, COMPLETADO, RECHAZADO, REEMBOLSADO
+- **TipoNotificacion**: PUSH, SMS, EMAIL, SISTEMA
+- **TipoReporte**: VENTAS_DIARIAS, VENTAS_MENSUALES, INVENTARIO, PEDIDOS_PENDIENTES, PRODUCTOS_MAS_VENDIDOS, CLIENTES_FRECUENTES, RENDIMIENTO_SUCURSAL, LOGISTICA_ENVIOS
 
-- **API Gateway**: Spring Cloud Gateway  
-- **Service Discovery**: Eureka  
-- **Circuit Breaker**: Resilience4j  
-- **Configuración Centralizada**: Spring Cloud Config  
-- **Logging Distribuido**: ELK Stack (Elasticsearch, Logstash, Kibana)  
+## Configuración y Ejecución
 
----
+### Requisitos Previos
+- Java 17 o superior
+- Maven
+- MySQL 8.x
+- Node.js y npm (para el frontend)
 
-## Despliegue
+### Configuración de la Base de Datos
+El proyecto utiliza MySQL como base de datos principal:
 
-- Contenedor Docker por cada microservicio  
-- Orquestación con Kubernetes  
-- Pipeline CI/CD independiente para cada servicio  
-- Monitoreo con Prometheus y Grafana  
+```properties
+# Configuración MySQL
+spring.datasource.url=jdbc:mysql://localhost:3306/perfulandia?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+spring.datasource.username=root
+spring.datasource.password=tu_contraseña
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
----
+# Configuración JPA/Hibernate
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+spring.jpa.properties.hibernate.format_sql=true
+```
+
+### Endpoints Disponibles
+
+#### Autenticación
+- POST `/api/auth/login` - Iniciar sesión
+- POST `/api/auth/registro` - Registrar nuevo usuario
+
+#### Usuarios
+- GET `/api/usuarios` - Listar todos los usuarios
+- GET `/api/usuarios/{id}` - Obtener usuario por ID
+- GET `/api/usuarios/email/{email}` - Buscar usuario por email
+- POST `/api/usuarios` - Crear nuevo usuario
+- PUT `/api/usuarios/{id}` - Actualizar usuario
+- DELETE `/api/usuarios/{id}` - Eliminar usuario
+
+#### Productos (En Desarrollo)
+Los siguientes endpoints están planificados pero aún no implementados:
+- GET `/api/productos` - Listar todos los productos
+- GET `/api/productos/{id}` - Obtener producto por ID
+- POST `/api/productos` - Crear nuevo producto
+- PUT `/api/productos/{id}` - Actualizar producto
+- DELETE `/api/productos/{id}` - Eliminar producto
+
+### Ejecución del Proyecto
+
+1. Clonar el repositorio:
+```bash
+git clone [url-del-repositorio]
+cd fullstack
+```
+
+2. Configurar la base de datos:
+- Crear una base de datos MySQL llamada `perfulandia`
+- Configurar las credenciales en `application.properties`
+
+3. Compilar y ejecutar el backend:
+```bash
+# Compilar
+mvn clean install
+
+# Ejecutar
+mvn spring-boot:run
+```
+
+4. Acceder a la aplicación:
+- API: http://localhost:8080
+- Swagger UI: http://localhost:8080/swagger-ui
+
+### Credenciales por Defecto
+- Usuario administrador:
+  - Email: admin@perfulandia.com
+  - Password: (configurado en data.sql)
 
 ## Seguridad
+- Autenticación basada en JWT
+- Roles y permisos implementados
+- Endpoints protegidos según rol
+- CORS configurado para desarrollo
 
-- OAuth2 para autenticación entre servicios  
-- API Gateway para seguridad perimetral  
-- Cifrado de datos sensibles  
-- Limitación de tasa (Rate Limiting)  
+## Desarrollo
+El proyecto está en desarrollo activo. Las características implementadas incluyen:
+- ✅ Sistema de autenticación y autorización
+- ✅ Gestión de usuarios y roles
+- ✅ API RESTful
+- ✅ Base de datos MySQL
+- ⏳ Frontend en React
+- 🚧 Gestión de productos (Modelo definido, endpoints pendientes)
+- ⏳ Sistema de ventas
+- ⏳ Gestión de inventario
 
----
+## Estado de Implementación de Requerimientos
 
-## Escalabilidad
+### Requerimientos Funcionales
 
-- Escalamiento independiente de servicios  
-- Bases de datos replicadas  
-- Caché distribuido con Redis  
-- Balanceo de carga  
+#### 1. Gestión de Usuarios y Autenticación ✅
+- ✅ Registro de usuarios
+- ✅ Inicio de sesión con JWT
+- ✅ Gestión de roles y permisos
+- ✅ Actualización de información personal
+- ⏳ Recuperación de contraseña
+- ⏳ Validación de email
 
----
+#### 2. Catálogo de Productos 🚧
+- ✅ Modelo de datos definido
+- ⏳ CRUD de productos
+- ⏳ Gestión de categorías
+- ⏳ Gestión de marcas
+- ⏳ Búsqueda y filtrado
+- ⏳ Gestión de imágenes
 
-## Monitoreo y Observabilidad
+#### 3. Procesamiento de Pedidos y Pagos ⏳
+- ✅ Modelo de datos definido
+- ⏳ Creación de pedidos
+- ⏳ Procesamiento de pagos
+- ⏳ Integración con pasarelas de pago
+- ⏳ Gestión de facturas
+- ⏳ Sistema de devoluciones
 
-- Logs centralizados  
-- Trazabilidad de requests  
-- Métricas de rendimiento  
-- Alertas automáticas  
+#### 4. Administración de Inventario 🚧
+- ✅ Modelo de datos definido
+- ⏳ Control de stock
+- ⏳ Alertas de stock mínimo
+- ⏳ Gestión de sucursales
+- ⏳ Transferencias entre sucursales
+- ⏳ Gestión de proveedores
+
+#### 5. Generación de Reportes ⏳
+- ✅ Modelo de datos definido
+- ⏳ Reportes de ventas
+- ⏳ Reportes de inventario
+- ⏳ Reportes de rendimiento
+- ⏳ Exportación a diferentes formatos
+- ⏳ Dashboard de métricas
+
+#### 6. Logística ⏳
+- ✅ Modelo de datos definido
+- ⏳ Seguimiento de envíos
+- ⏳ Planificación de rutas
+- ⏳ Gestión de entregas
+- ⏳ Integración con transportistas
+- ⏳ Notificaciones de estado
+
+#### 7. Estadísticas y Monitoreo ⏳
+- ⏳ Dashboard de métricas
+- ⏳ Análisis de ventas
+- ⏳ Monitoreo de rendimiento
+- ⏳ Alertas del sistema
+- ⏳ KPIs de negocio
+
+### Requerimientos No Funcionales
+
+#### 1. Escalabilidad y Disponibilidad 🚧
+- ✅ Arquitectura en capas
+- ✅ Base de datos MySQL
+- ⏳ Caché distribuido
+- ⏳ Balanceo de carga
+- ⏳ Alta disponibilidad
+
+#### 2. Resistencia a Fallos 🚧
+- ✅ Manejo de excepciones
+- ✅ Transacciones
+- ⏳ Circuit breakers
+- ⏳ Reintentos automáticos
+- ⏳ Recuperación de fallos
+
+#### 3. Integración con Pagos ⏳
+- ⏳ Integración con pasarelas
+- ⏳ Procesamiento seguro
+- ⏳ Múltiples métodos de pago
+- ⏳ Gestión de reembolsos
+- ⏳ Facturación electrónica
+
+#### 4. Seguridad e Integridad 🚧
+- ✅ Autenticación JWT
+- ✅ Roles y permisos
+- ✅ Encriptación de datos sensibles
+- ⏳ Auditoría de acciones
+- ⏳ Cumplimiento GDPR/LGPD
+
+### Historias de Usuario por Rol
+
+#### Administrador 🚧
+- ✅ Gestión básica de usuarios
+- ✅ Asignación de roles
+- ⏳ Monitoreo del sistema
+- ⏳ Copias de seguridad
+- ⏳ Gestión de permisos avanzada
+
+#### Gerente de Sucursal ⏳
+- ⏳ Gestión de inventario
+- ⏳ Reportes de ventas
+- ⏳ Configuración de sucursal
+- ⏳ Autorización de pedidos
+- ⏳ Gestión de personal
+
+#### Empleado de Ventas ⏳
+- ⏳ Procesamiento de ventas
+- ⏳ Gestión de devoluciones
+- ⏳ Verificación de inventario
+- ⏳ Emisión de facturas
+- ⏳ Atención al cliente
+
+#### Empleado de Logística ⏳
+- ⏳ Gestión de envíos
+- ⏳ Planificación de rutas
+- ⏳ Actualización de estados
+- ⏳ Gestión de proveedores
+- ⏳ Recepción de mercancías
+
+#### Cliente 🚧
+- ✅ Registro e inicio de sesión
+- ✅ Actualización de perfil
+- ⏳ Carrito de compras
+- ⏳ Historial de pedidos
+- ⏳ Evaluaciones de productos
+- ⏳ Códigos promocionales
+- ⏳ Atención al cliente
+
+### Leyenda
+- ✅ Implementado
+- 🚧 En desarrollo/parcialmente implementado
+- ⏳ Pendiente
+
+## Contribución
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+## Licencia
+Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.md) para más detalles.
+
