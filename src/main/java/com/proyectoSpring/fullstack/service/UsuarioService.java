@@ -98,7 +98,7 @@ public class UsuarioService {
             int intentos = usuario.getIntentosFallidos() + 1;
             usuario.setIntentosFallidos(intentos);
             if (intentos >= 5) {
-                usuario.setActivo(false); // O usuario.setBloqueado(true);
+                usuario.setBloqueado(true); // Bloquear al usuario
             }
             usuarioRepository.save(usuario);
         });
