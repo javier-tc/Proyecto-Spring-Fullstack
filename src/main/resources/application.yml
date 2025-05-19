@@ -1,53 +1,36 @@
 spring:
-  profiles:
-    active: dev
-
----
-spring:
-  config:
-    activate:
-      on-profile: dev
+  application:
+    name: Proyecto spring fullstack
   datasource:
-    url: jdbc:mysql://localhost:3306/perfulandia?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
-    username: root
-    password: root
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      auto-commit: false
   jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
+        dialect: org.hibernate.dialect.MySQLDialect
+        connection:
+          provider_disables_autocommit: true
+        transaction:
+          auto_commit: false
   sql:
     init:
-      mode: always
-      schema-locations: classpath:schema.sql
+      mode: never
       data-locations: classpath:data.sql
-      continue-on-error: false
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-
-# Configuración JWT
-jwt:
-  secret: ${JWT_SECRET:tu_clave_secreta_muy_segura_para_el_token_jwt_debe_ser_muy_larga_y_segura}
-  expiration: ${JWT_EXPIRATION:86400000} # 24 horas en milisegundos
+      continue-on-error: true
+      platform: mysql
+      schema-locations: classpath:schema.sql
 
 server:
-  port: 8080
-  error:
-    include-message: always
-    include-binding-errors: always
+  port: ${PORT:8080}
 
 logging:
   level:
@@ -55,44 +38,11 @@ logging:
     com.proyectoSpring.fullstack: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.springframework.security: TRACE
-    org.springframework.web: DEBUG
+    com.mysql.cj.jdbc: DEBUG
     org.springframework.jdbc.datasource.init: DEBUG
+    org.springframework.boot.autoconfigure.jdbc: DEBUG
 
----
-spring:
-  config:
-    activate:
-      on-profile: prod
-  datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-  mail:
-    host: ${MAIL_HOST}
-    port: ${MAIL_PORT}
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-
-server:
-  port: ${PORT:8080}
-
-logging:
-  level:
-    root: WARN
-    com.proyectoSpring.fullstack: INFO
-    org.hibernate.SQL: WARN 
+# Configuración JWT
+jwt:
+  secret: ${JWT_SECRET:tu_clave_secreta_muy_segura_para_el_token_jwt_debe_ser_muy_larga_y_segura}
+  expiration: ${JWT_EXPIRATION:86400000} 

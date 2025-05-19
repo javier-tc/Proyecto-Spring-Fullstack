@@ -5,6 +5,8 @@ import com.proyectoSpring.fullstack.model.Rol;
 import com.proyectoSpring.fullstack.model.TipoRol;
 import com.proyectoSpring.fullstack.repository.UsuarioRepository;
 import com.proyectoSpring.fullstack.repository.RolRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ import java.util.Set;
 
 @Service
 public class UsuarioService {
+    private static final Logger logger = LoggerFactory.getLogger(UsuarioService.class);
     private final UsuarioRepository usuarioRepository;
     private final RolRepository rolRepository;
     private final PasswordEncoder passwordEncoder;
@@ -43,25 +46,36 @@ public class UsuarioService {
 
     @Transactional
     public Usuario save(Usuario usuario) {
-        // Validar email único
-        if (usuario.getId() == null && usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
-            throw new RuntimeException("El email ya está registrado");
-        }
+        logger.info("Intentando guardar usuario: {}", usuario.getEmail());
+        try {
+            // Validar email único
+            if (usuario.getId() == null && usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
+                logger.warn("El email {} ya está registrado", usuario.getEmail());
+                throw new RuntimeException("El email ya está registrado");
+            }
 
-        // Encriptar contraseña si es un nuevo usuario o si se cambió
-        if (usuario.getId() == null || !usuario.getPassword().startsWith("$2a$")) {
-            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-        }
+            // Encriptar contraseña si es un nuevo usuario o si se cambió
+            if (usuario.getId() == null || !usuario.getPassword().startsWith("$2a$")) {
+                logger.debug("Encriptando contraseña para usuario: {}", usuario.getEmail());
+                usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+            }
 
-        // Si no se especifican roles, asignar rol CLIENTE por defecto
-        if (usuario.getRoles() == null || usuario.getRoles().isEmpty()) {
-            Set<Rol> roles = new HashSet<>();
-            rolRepository.findByNombre(TipoRol.CLIENTE)
-                .ifPresent(roles::add);
-            usuario.setRoles(roles);
-        }
+            // Si no se especifican roles, asignar rol CLIENTE por defecto
+            if (usuario.getRoles() == null || usuario.getRoles().isEmpty()) {
+                logger.debug("Asignando rol CLIENTE por defecto a usuario: {}", usuario.getEmail());
+                Set<Rol> roles = new HashSet<>();
+                rolRepository.findByNombre(TipoRol.CLIENTE)
+                    .ifPresent(roles::add);
+                usuario.setRoles(roles);
+            }
 
-        return usuarioRepository.save(usuario);
+            Usuario savedUsuario = usuarioRepository.save(usuario);
+            logger.info("Usuario guardado exitosamente: {}", savedUsuario.getEmail());
+            return savedUsuario;
+        } catch (Exception e) {
+            logger.error("Error al guardar usuario: {}", usuario.getEmail(), e);
+            throw e;
+        }
     }
 
     public void deleteById(Long id) {

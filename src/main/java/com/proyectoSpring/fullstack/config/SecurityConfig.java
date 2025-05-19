@@ -60,17 +60,10 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // Permitir acceso a endpoints públicos
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers("/api/usuarios/registro").permitAll()
-                .requestMatchers("/api/usuarios/email/**").permitAll()
-                .requestMatchers("GET", "/api/usuarios").permitAll()
-                // Requerir autenticación para el resto
-                .anyRequest().authenticated()
+                // Permitir acceso a todas las rutas temporalmente
+                .anyRequest().permitAll()
             )
-            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin())) // Para H2 Console
+            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
