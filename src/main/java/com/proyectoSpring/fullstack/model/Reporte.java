@@ -36,15 +36,4 @@ public class Reporte {
     protected void onCreate() {
         fechaGeneracion = LocalDateTime.now();
     }
-}
-
-enum TipoReporte {
-    VENTAS_DIARIAS,
-    VENTAS_MENSUALES,
-    INVENTARIO,
-    PEDIDOS_PENDIENTES,
-    PRODUCTOS_MAS_VENDIDOS,
-    CLIENTES_FRECUENTES,
-    RENDIMIENTO_SUCURSAL,
-    LOGISTICA_ENVIOS
 } 

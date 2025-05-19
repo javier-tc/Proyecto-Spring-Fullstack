@@ -1,6 +1,7 @@
 package com.proyectoSpring.fullstack.service;
 
 import com.proyectoSpring.fullstack.model.Reporte;
+import com.proyectoSpring.fullstack.model.TipoReporte;
 import com.proyectoSpring.fullstack.repository.ReporteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class ReporteService {
         return reporteRepository.findById(id);
     }
 
-    public List<Reporte> findByTipo(String tipo) {
+    public List<Reporte> getReportesByTipo(TipoReporte tipo) {
         return reporteRepository.findByTipo(tipo);
     }
 

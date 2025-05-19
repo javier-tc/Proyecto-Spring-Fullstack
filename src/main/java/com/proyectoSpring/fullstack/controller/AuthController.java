@@ -10,12 +10,14 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
 public class AuthController {
-
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     private final AuthService authService;
     private final UsuarioService usuarioService;
 
@@ -27,16 +29,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        try {
-            LoginResponse response = authService.login(loginRequest);
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        LoginResponse response = authService.login(loginRequest);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/registro")
-    public ResponseEntity<Usuario> registro(@Valid @RequestBody RegistroRequest registroRequest) {
+    public ResponseEntity<?> registro(@Valid @RequestBody RegistroRequest registroRequest) {
+        logger.info("Intentando registrar nuevo usuario: {}", registroRequest.getEmail());
         try {
             Usuario usuario = new Usuario();
             usuario.setEmail(registroRequest.getEmail());
@@ -45,9 +44,11 @@ public class AuthController {
             usuario.setApellido(registroRequest.getApellido());
             
             Usuario usuarioGuardado = usuarioService.save(usuario);
+            logger.info("Usuario registrado exitosamente: {}", usuarioGuardado.getEmail());
             return ResponseEntity.ok(usuarioGuardado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
+        } catch (Exception e) {
+            logger.error("Error al registrar usuario: {}", registroRequest.getEmail(), e);
+            throw e; // Propagar la excepción para que sea manejada por GlobalExceptionHandler
         }
     }
 } 

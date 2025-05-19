@@ -18,6 +18,9 @@ public class Sucursal {
     private String direccion;
 
     @Column(nullable = false)
+    private String ciudad;
+
+    @Column(nullable = false)
     private String telefono;
 
     @Column(nullable = false)

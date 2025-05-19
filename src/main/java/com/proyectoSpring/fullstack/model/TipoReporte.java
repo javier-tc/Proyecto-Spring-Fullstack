@@ -1,0 +1,12 @@
+package com.proyectoSpring.fullstack.model;
+
+public enum TipoReporte {
+    VENTAS_DIARIAS,
+    VENTAS_MENSUALES,
+    INVENTARIO,
+    PEDIDOS_PENDIENTES,
+    PRODUCTOS_MAS_VENDIDOS,
+    CLIENTES_FRECUENTES,
+    RENDIMIENTO_SUCURSAL,
+    LOGISTICA_ENVIOS
+} 

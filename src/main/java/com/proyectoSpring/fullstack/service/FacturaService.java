@@ -25,8 +25,8 @@ public class FacturaService {
         return facturaRepository.findById(id);
     }
 
-    public List<Factura> findByUsuarioId(Long usuarioId) {
-        return facturaRepository.findByUsuarioId(usuarioId);
+    public List<Factura> getFacturasByUsuario(Long usuarioId) {
+        return facturaRepository.findByClienteId(usuarioId);
     }
 
     public Factura save(Factura factura) {

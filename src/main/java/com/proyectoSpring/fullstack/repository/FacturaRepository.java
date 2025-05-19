@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface FacturaRepository extends JpaRepository<Factura, Long> {
-    // Buscar facturas por usuario
-    List<Factura> findByUsuarioId(Long usuarioId);
+    // Buscar facturas por cliente
+    List<Factura> findByClienteId(Long clienteId);
 }

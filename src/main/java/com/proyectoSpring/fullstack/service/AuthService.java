@@ -7,9 +7,11 @@ import com.proyectoSpring.fullstack.repository.UsuarioRepository;
 import com.proyectoSpring.fullstack.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,14 +19,17 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
 
     @Autowired
     public AuthService(AuthenticationManager authenticationManager,
                       JwtTokenProvider jwtTokenProvider,
-                      UsuarioRepository usuarioRepository) {
+                      UsuarioRepository usuarioRepository,
+                      UsuarioService usuarioService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.usuarioRepository = usuarioRepository;
+        this.usuarioService = usuarioService;
     }
 
     public LoginResponse login(LoginRequest loginRequest) {
@@ -37,9 +42,18 @@ public class AuthService {
             );
 
             Usuario usuario = usuarioRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + loginRequest.getEmail()));
+
+            if (!usuario.isActivo()) {
+                throw new BadCredentialsException("La cuenta está desactivada");
+            }
+
+            if (usuario.isBloqueado()) {
+                throw new BadCredentialsException("La cuenta está bloqueada por múltiples intentos fallidos");
+            }
 
             String token = jwtTokenProvider.generateToken(authentication);
+            usuarioService.restablecerIntentosFallidos(usuario.getEmail());
 
             return new LoginResponse(
                 token,
@@ -48,7 +62,8 @@ public class AuthService {
                 usuario.getApellido()
             );
         } catch (AuthenticationException e) {
-            throw new RuntimeException("Credenciales inválidas");
+            usuarioService.registrarIntentoFallido(loginRequest.getEmail());
+            throw e;
         }
     }
 } 

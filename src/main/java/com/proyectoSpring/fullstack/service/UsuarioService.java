@@ -8,6 +8,7 @@ import com.proyectoSpring.fullstack.repository.RolRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +52,7 @@ public class UsuarioService {
             // Validar email único
             if (usuario.getId() == null && usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
                 logger.warn("El email {} ya está registrado", usuario.getEmail());
-                throw new RuntimeException("El email ya está registrado");
+                throw new DataIntegrityViolationException("El email ya está registrado");
             }
 
             // Encriptar contraseña si es un nuevo usuario o si se cambió
@@ -72,9 +73,12 @@ public class UsuarioService {
             Usuario savedUsuario = usuarioRepository.save(usuario);
             logger.info("Usuario guardado exitosamente: {}", savedUsuario.getEmail());
             return savedUsuario;
+        } catch (DataIntegrityViolationException e) {
+            logger.error("Error de integridad al guardar usuario: {}", usuario.getEmail(), e);
+            throw e;
         } catch (Exception e) {
             logger.error("Error al guardar usuario: {}", usuario.getEmail(), e);
-            throw e;
+            throw new RuntimeException("Error al guardar el usuario", e);
         }
     }
 

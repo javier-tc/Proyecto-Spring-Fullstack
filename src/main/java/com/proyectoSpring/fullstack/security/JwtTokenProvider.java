@@ -2,6 +2,7 @@ package com.proyectoSpring.fullstack.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,8 +21,8 @@ public class JwtTokenProvider {
     private long jwtExpiration;
 
     private Key getSigningKey() {
-        byte[] keyBytes = jwtSecret.getBytes();
-        return Keys.hmacShaKeyFor(keyBytes);
+        // Generar una clave segura usando el algoritmo HS256
+        return Keys.secretKeyFor(SignatureAlgorithm.HS256);
     }
 
     public String generateToken(Authentication authentication) {
