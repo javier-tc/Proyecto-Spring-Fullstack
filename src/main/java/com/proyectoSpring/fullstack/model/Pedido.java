@@ -10,6 +10,15 @@ import java.util.List;
 @Entity
 @Table(name = "pedidos")
 public class Pedido {
+    public enum EstadoPedido {
+        PENDIENTE,
+        CONFIRMADO,
+        EN_PREPARACION,
+        ENVIADO,
+        ENTREGADO,
+        CANCELADO
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

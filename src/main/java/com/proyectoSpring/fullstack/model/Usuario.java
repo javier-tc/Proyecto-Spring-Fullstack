@@ -12,7 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name = "usuarios", uniqueConstraints = {
-    @UniqueConstraint(columnNames = "email")
+        @UniqueConstraint(columnNames = "email")
 })
 public class Usuario {
     @Id
@@ -31,6 +31,14 @@ public class Usuario {
     @Column(nullable = false)
     private String apellido;
 
+    // Nuevo campo: intentos fallidos de login
+    @Column(nullable = false)
+    private int intentosFallidos = 0;
+
+    // Nuevo campo: indica si el usuario está bloqueado
+    @Column(nullable = false)
+    private boolean bloqueado = false;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "usuario_roles",
@@ -41,4 +49,4 @@ public class Usuario {
 
     @Column(nullable = false)
     private boolean activo = true;
-} 
+}

@@ -24,9 +24,9 @@ public class UsuarioService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UsuarioService(UsuarioRepository usuarioRepository, 
-                         RolRepository rolRepository,
-                         PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository usuarioRepository,
+            RolRepository rolRepository,
+            PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.rolRepository = rolRepository;
         this.passwordEncoder = passwordEncoder;
@@ -88,7 +88,7 @@ public class UsuarioService {
                 .map(usuarioExistente -> {
                     // Mantener el ID original
                     usuarioActualizado.setId(id);
-                    
+
                     // Si la contraseña no está encriptada, encriptarla
                     if (!usuarioActualizado.getPassword().startsWith("$2a$")) {
                         usuarioActualizado.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));
@@ -96,9 +96,34 @@ public class UsuarioService {
                         // Si ya está encriptada, mantener la contraseña existente
                         usuarioActualizado.setPassword(usuarioExistente.getPassword());
                     }
-                    
+
                     return usuarioRepository.save(usuarioActualizado);
                 })
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
-} 
+
+    // Añadido: Incrementa los intentos fallidos y bloquea el usuario si supera el
+    // límite.
+
+    @Transactional
+    public void registrarIntentoFallido(String email) {
+        usuarioRepository.findByEmail(email).ifPresent(usuario -> {
+            int intentos = usuario.getIntentosFallidos() + 1;
+            usuario.setIntentosFallidos(intentos);
+            if (intentos >= 5) {
+                usuario.setBloqueado(true); // Bloquear al usuario
+            }
+            usuarioRepository.save(usuario);
+        });
+    }
+
+    // Añadido: Restablece los intentos fallidos tras un login exitoso.
+
+    @Transactional
+    public void restablecerIntentosFallidos(String email) {
+        usuarioRepository.findByEmail(email).ifPresent(usuario -> {
+            usuario.setIntentosFallidos(0);
+            usuarioRepository.save(usuario);
+        });
+    }
+}
