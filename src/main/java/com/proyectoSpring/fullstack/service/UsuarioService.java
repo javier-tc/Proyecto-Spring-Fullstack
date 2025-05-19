@@ -21,9 +21,9 @@ public class UsuarioService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UsuarioService(UsuarioRepository usuarioRepository, 
-                         RolRepository rolRepository,
-                         PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository usuarioRepository,
+            RolRepository rolRepository,
+            PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.rolRepository = rolRepository;
         this.passwordEncoder = passwordEncoder;
@@ -57,7 +57,7 @@ public class UsuarioService {
         if (usuario.getRoles() == null || usuario.getRoles().isEmpty()) {
             Set<Rol> roles = new HashSet<>();
             rolRepository.findByNombre(TipoRol.CLIENTE)
-                .ifPresent(roles::add);
+                    .ifPresent(roles::add);
             usuario.setRoles(roles);
         }
 
@@ -74,7 +74,7 @@ public class UsuarioService {
                 .map(usuarioExistente -> {
                     // Mantener el ID original
                     usuarioActualizado.setId(id);
-                    
+
                     // Si la contraseña no está encriptada, encriptarla
                     if (!usuarioActualizado.getPassword().startsWith("$2a$")) {
                         usuarioActualizado.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));
@@ -82,9 +82,35 @@ public class UsuarioService {
                         // Si ya está encriptada, mantener la contraseña existente
                         usuarioActualizado.setPassword(usuarioExistente.getPassword());
                     }
-                    
+
                     return usuarioRepository.save(usuarioActualizado);
                 })
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
-} 
+
+    // Añadido: Incrementa los intentos fallidos y bloquea el usuario si supera el
+    // límite.
+
+    @Transactional
+    public void registrarIntentoFallido(String email) {
+        usuarioRepository.findByEmail(email).ifPresent(usuario -> {
+            // Suponiendo que tienes los campos intentosFallidos y bloqueado en Usuario
+            int intentos = usuario.getIntentosFallidos() + 1;
+            usuario.setIntentosFallidos(intentos);
+            if (intentos >= 5) {
+                usuario.setActivo(false); // O usuario.setBloqueado(true);
+            }
+            usuarioRepository.save(usuario);
+        });
+    }
+
+    // Añadido: Restablece los intentos fallidos tras un login exitoso.
+
+    @Transactional
+    public void restablecerIntentosFallidos(String email) {
+        usuarioRepository.findByEmail(email).ifPresent(usuario -> {
+            usuario.setIntentosFallidos(0);
+            usuarioRepository.save(usuario);
+        });
+    }
+}
