@@ -94,7 +94,6 @@ public class UsuarioService {
     @Transactional
     public void registrarIntentoFallido(String email) {
         usuarioRepository.findByEmail(email).ifPresent(usuario -> {
-            // Suponiendo que tienes los campos intentosFallidos y bloqueado en Usuario
             int intentos = usuario.getIntentosFallidos() + 1;
             usuario.setIntentosFallidos(intentos);
             if (intentos >= 5) {
