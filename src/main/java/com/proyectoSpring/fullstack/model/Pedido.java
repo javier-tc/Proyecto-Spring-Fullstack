@@ -42,13 +42,13 @@ public class Pedido {
     private Sucursal sucursal;
 
     private String observaciones;
-}
 
-enum EstadoPedido {
-    PENDIENTE,
-    CONFIRMADO,
-    EN_PREPARACION,
-    ENVIADO,
-    ENTREGADO,
-    CANCELADO
-} 
+    public static enum EstadoPedido {
+        PENDIENTE,
+        CONFIRMADO,
+        EN_PREPARACION,
+        ENVIADO,
+        ENTREGADO,
+        CANCELADO
+    }
+}
