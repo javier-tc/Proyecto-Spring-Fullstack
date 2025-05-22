@@ -93,6 +93,25 @@ public class UsuarioService {
                     // Mantener el ID original
                     usuarioActualizado.setId(id);
 
+                    // Preservar la sucursal existente si no se proporciona una nueva
+                    if (usuarioActualizado.getSucursal() == null) {
+                        usuarioActualizado.setSucursal(usuarioExistente.getSucursal());
+                    }
+
+                    // Preservar los roles existentes si no se proporcionan nuevos
+                    if (usuarioActualizado.getRoles() == null || usuarioActualizado.getRoles().isEmpty()) {
+                        usuarioActualizado.setRoles(usuarioExistente.getRoles());
+                    }
+
+                    // Preservar el estado activo si no se proporciona uno nuevo
+                    if (usuarioActualizado.isActivo() != usuarioExistente.isActivo()) {
+                        usuarioActualizado.setActivo(usuarioExistente.isActivo());
+                    }
+
+                    // Preservar los intentos fallidos y estado de bloqueo
+                    usuarioActualizado.setIntentosFallidos(usuarioExistente.getIntentosFallidos());
+                    usuarioActualizado.setBloqueado(usuarioExistente.isBloqueado());
+
                     // Si la contraseña no está encriptada, encriptarla
                     if (!usuarioActualizado.getPassword().startsWith("$2a$")) {
                         usuarioActualizado.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));

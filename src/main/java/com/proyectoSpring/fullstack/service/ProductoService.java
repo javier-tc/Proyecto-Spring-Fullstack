@@ -26,6 +26,10 @@ public class ProductoService {
         return productoRepository.findById(id);
     }
 
+    public Optional<Producto> findByCodigo(String codigo) {
+        return productoRepository.findByCodigo(codigo);
+    }
+
     public Producto save(Producto producto) {
         return productoRepository.save(producto);
     }

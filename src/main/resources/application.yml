@@ -11,6 +11,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
+      # ddl-auto: none
       ddl-auto: update
     show-sql: true
     properties:
@@ -23,11 +24,13 @@ spring:
           auto_commit: false
   sql:
     init:
+      # mode: always
       mode: never
-      data-locations: classpath:data.sql
-      continue-on-error: true
-      platform: mysql
       schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+      continue-on-error: false
+      platform: mysql
+      encoding: UTF-8
 
 server:
   port: ${PORT:8080}

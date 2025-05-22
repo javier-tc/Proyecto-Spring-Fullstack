@@ -245,7 +245,7 @@ cd fullstack
 
 2. Configurar la base de datos:
 - Crear una base de datos MySQL llamada `perfulandia`
-- Configurar las credenciales en `application.properties`
+- Configurar las credenciales en `.env.local`
 
 3. Compilar y ejecutar el backend:
 ```bash

@@ -60,7 +60,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // Permitir acceso a todas las rutas temporalmente
+                // .requestMatchers("/api/auth/**").permitAll()
+                // .anyRequest().authenticated()
                 .anyRequest().permitAll()
             )
             .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))

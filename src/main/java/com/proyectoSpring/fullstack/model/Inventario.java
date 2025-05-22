@@ -28,9 +28,6 @@ public class Inventario {
     @Column(nullable = false)
     private Integer stockMaximo;
 
-    @Column
-    private String ubicacionEstante;
-
     public void ajustarStock(Integer cantidad) {
         this.cantidad += cantidad;
     }

@@ -49,4 +49,8 @@ public class Usuario {
 
     @Column(nullable = false)
     private boolean activo = true;
+
+    @ManyToOne
+    @JoinColumn(name = "sucursal_id")
+    private Sucursal sucursal;
 }
