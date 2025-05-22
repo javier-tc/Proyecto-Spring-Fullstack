@@ -213,28 +213,6 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
 spring.jpa.properties.hibernate.format_sql=true
 ```
 
-### Endpoints Disponibles
-
-#### Autenticación
-- POST `/api/auth/login` - Iniciar sesión
-- POST `/api/auth/registro` - Registrar nuevo usuario
-
-#### Usuarios
-- GET `/api/usuarios` - Listar todos los usuarios
-- GET `/api/usuarios/{id}` - Obtener usuario por ID
-- GET `/api/usuarios/email/{email}` - Buscar usuario por email
-- POST `/api/usuarios` - Crear nuevo usuario
-- PUT `/api/usuarios/{id}` - Actualizar usuario
-- DELETE `/api/usuarios/{id}` - Eliminar usuario
-
-#### Productos (En Desarrollo)
-Los siguientes endpoints están planificados pero aún no implementados:
-- GET `/api/productos` - Listar todos los productos
-- GET `/api/productos/{id}` - Obtener producto por ID
-- POST `/api/productos` - Crear nuevo producto
-- PUT `/api/productos/{id}` - Actualizar producto
-- DELETE `/api/productos/{id}` - Eliminar producto
-
 ### Ejecución del Proyecto
 
 1. Clonar el repositorio:
@@ -258,12 +236,11 @@ mvn spring-boot:run
 
 4. Acceder a la aplicación:
 - API: http://localhost:8080
-- Swagger UI: http://localhost:8080/swagger-ui
 
 ### Credenciales por Defecto
 - Usuario administrador:
   - Email: admin@perfulandia.com
-  - Password: (configurado en data.sql)
+  - Password: (configurado en data.sql) / admin123
 
 ## Seguridad
 - Autenticación basada en JWT
@@ -277,10 +254,9 @@ El proyecto está en desarrollo activo. Las características implementadas inclu
 - ✅ Gestión de usuarios y roles
 - ✅ API RESTful
 - ✅ Base de datos MySQL
-- ⏳ Frontend en React
-- 🚧 Gestión de productos (Modelo definido, endpoints pendientes)
+- ✅ Gestión de productos
 - ⏳ Sistema de ventas
-- ⏳ Gestión de inventario
+- ✅ Gestión de inventario
 
 ## Estado de Implementación de Requerimientos
 
@@ -296,11 +272,8 @@ El proyecto está en desarrollo activo. Las características implementadas inclu
 
 #### 2. Catálogo de Productos 🚧
 - ✅ Modelo de datos definido
-- ⏳ CRUD de productos
-- ⏳ Gestión de categorías
-- ⏳ Gestión de marcas
-- ⏳ Búsqueda y filtrado
-- ⏳ Gestión de imágenes
+- ✅ CRUD de productos
+- ✅ Gestión de categorías
 
 #### 3. Procesamiento de Pedidos y Pagos ⏳
 - ✅ Modelo de datos definido
@@ -312,11 +285,10 @@ El proyecto está en desarrollo activo. Las características implementadas inclu
 
 #### 4. Administración de Inventario 🚧
 - ✅ Modelo de datos definido
-- ⏳ Control de stock
+- ✅ Control de stock
 - ⏳ Alertas de stock mínimo
 - ⏳ Gestión de sucursales
 - ⏳ Transferencias entre sucursales
-- ⏳ Gestión de proveedores
 
 #### 5. Generación de Reportes ⏳
 - ✅ Modelo de datos definido
@@ -369,7 +341,6 @@ El proyecto está en desarrollo activo. Las características implementadas inclu
 - ✅ Roles y permisos
 - ✅ Encriptación de datos sensibles
 - ⏳ Auditoría de acciones
-- ⏳ Cumplimiento GDPR/LGPD
 
 ### Historias de Usuario por Rol
 
@@ -381,7 +352,7 @@ El proyecto está en desarrollo activo. Las características implementadas inclu
 - ⏳ Gestión de permisos avanzada
 
 #### Gerente de Sucursal ⏳
-- ⏳ Gestión de inventario
+- ✅ Gestión de inventario
 - ⏳ Reportes de ventas
 - ⏳ Configuración de sucursal
 - ⏳ Autorización de pedidos
@@ -390,7 +361,7 @@ El proyecto está en desarrollo activo. Las características implementadas inclu
 #### Empleado de Ventas ⏳
 - ⏳ Procesamiento de ventas
 - ⏳ Gestión de devoluciones
-- ⏳ Verificación de inventario
+- ✅ Verificación de inventario
 - ⏳ Emisión de facturas
 - ⏳ Atención al cliente
 
@@ -424,4 +395,3 @@ El proyecto está en desarrollo activo. Las características implementadas inclu
 
 ## Licencia
 Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE.md](LICENSE.md) para más detalles.
-
