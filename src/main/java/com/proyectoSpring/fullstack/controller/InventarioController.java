@@ -1,5 +1,6 @@
 package com.proyectoSpring.fullstack.controller;
 
+import com.proyectoSpring.fullstack.assembler.InventarioAssembler;
 import com.proyectoSpring.fullstack.dto.InventarioRequest;
 import com.proyectoSpring.fullstack.model.Inventario;
 import com.proyectoSpring.fullstack.model.Producto;
@@ -10,43 +11,55 @@ import com.proyectoSpring.fullstack.service.CategoriaService;
 import com.proyectoSpring.fullstack.model.Categoria;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/api/inventario")
 @CrossOrigin(origins = "*")
-
 public class InventarioController {
 
     private static final Logger logger = LoggerFactory.getLogger(InventarioController.class);
     private final InventarioService inventarioService;
     private final ProductoService productoService;
     private final CategoriaService categoriaService;
+    private final InventarioAssembler inventarioAssembler;
 
     @Autowired
     public InventarioController(InventarioService inventarioService,
                                 ProductoService productoService,
-                                CategoriaService categoriaService) {
+                                CategoriaService categoriaService,
+                                InventarioAssembler inventarioAssembler) {
         this.inventarioService = inventarioService;
         this.productoService = productoService;
         this.categoriaService = categoriaService;
+        this.inventarioAssembler = inventarioAssembler;
     }
 
     private final Long dummySucursalId = 1L;
 
     @GetMapping("/sucursal")
-    public ResponseEntity<List<Inventario>> getInventarioDummySucursal() {
-        return ResponseEntity.ok(inventarioService.findBySucursalId(dummySucursalId));
+    public CollectionModel<EntityModel<Inventario>> getInventarioDummySucursal() {
+        List<EntityModel<Inventario>> inventarios = inventarioService.findBySucursalId(dummySucursalId).stream()
+                .map(inventarioAssembler::toModel)
+                .collect(Collectors.toList());
+        
+        return CollectionModel.of(inventarios,
+                linkTo(methodOn(InventarioController.class).getInventarioDummySucursal()).withSelfRel());
     }
 
     @PostMapping
-    public ResponseEntity<?> crearProductoEnInventario(@Valid @RequestBody InventarioRequest request) {
+    public ResponseEntity<EntityModel<Inventario>> crearProductoEnInventario(@Valid @RequestBody InventarioRequest request) {
         try {
             // Crear o actualizar el producto
             Producto producto = productoService.findByCodigo(request.getCodigo())
@@ -81,15 +94,15 @@ public class InventarioController {
            
             inventario = inventarioService.save(inventario);
 
-            return ResponseEntity.ok(inventario);
+            return ResponseEntity.ok(inventarioAssembler.toModel(inventario));
         } catch (Exception e) {
             logger.error("Error al crear producto en inventario: {}", e.getMessage());
-            return ResponseEntity.badRequest().body("Error al crear el producto: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 
     @PutMapping("/{inventarioId}")
-    public ResponseEntity<?> actualizarInventario(
+    public ResponseEntity<EntityModel<Inventario>> actualizarInventario(
             @PathVariable Long inventarioId,
             @Valid @RequestBody InventarioRequest request) {
         try {
@@ -111,15 +124,15 @@ public class InventarioController {
 
             inventario = inventarioService.save(inventario);
 
-            return ResponseEntity.ok(inventario);
+            return ResponseEntity.ok(inventarioAssembler.toModel(inventario));
         } catch (Exception e) {
             logger.error("Error al actualizar inventario: {}", e.getMessage());
-            return ResponseEntity.badRequest().body("Error al actualizar el inventario: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 
     @DeleteMapping("/{inventarioId}")
-    public ResponseEntity<?> eliminarInventario(@PathVariable Long inventarioId) {
+    public ResponseEntity<Void> eliminarInventario(@PathVariable Long inventarioId) {
         try {
             Inventario inventario = inventarioService.findById(inventarioId)
                     .orElseThrow(() -> new RuntimeException("Inventario no encontrado"));
@@ -135,7 +148,7 @@ public class InventarioController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             logger.error("Error al eliminar inventario: {}", e.getMessage());
-            return ResponseEntity.badRequest().body("Error al eliminar el inventario: " + e.getMessage());
+            return ResponseEntity.badRequest().build();
         }
     }
 }
