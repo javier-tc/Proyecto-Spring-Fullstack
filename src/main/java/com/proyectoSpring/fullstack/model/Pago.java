@@ -17,8 +17,9 @@ public class Pago {
     @JoinColumn(name = "pedido_id", nullable = false)
     private Pedido pedido;
 
-    @Column(name = "numero_transaccion", nullable = false)
-    private String numeroTransaccion;
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal monto;
@@ -28,25 +29,26 @@ public class Pago {
     private MetodoPago metodoPago;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "estado", nullable = false)
     private EstadoPago estado;
 
     @Column(name = "fecha_pago", nullable = false)
     private LocalDateTime fechaPago;
 
-    @Column(name = "detalles_transaccion")
-    private String detallesTransaccion;
+    @Column(name = "referencia_pago")
+    private String referenciaPago;
+
+    @Column(name = "comprobante_url")
+    private String comprobanteUrl;
+
+    @Column(name = "observaciones")
+    private String observaciones;
 
     @PrePersist
     protected void onCreate() {
         fechaPago = LocalDateTime.now();
-        estado = EstadoPago.PENDIENTE;
+        if (estado == null) {
+            estado = EstadoPago.PENDIENTE;
+        }
     }
-}
-
-enum EstadoPago {
-    PENDIENTE,
-    COMPLETADO,
-    RECHAZADO,
-    REEMBOLSADO
 } 

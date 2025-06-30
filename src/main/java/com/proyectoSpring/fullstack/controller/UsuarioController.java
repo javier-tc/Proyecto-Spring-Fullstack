@@ -3,9 +3,6 @@ package com.proyectoSpring.fullstack.controller;
 import com.proyectoSpring.fullstack.assembler.UsuarioAssembler;
 import com.proyectoSpring.fullstack.model.Usuario;
 import com.proyectoSpring.fullstack.service.UsuarioService;
-import jakarta.annotation.PostConstruct;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -22,7 +19,6 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("/api/usuarios")
 @CrossOrigin(origins = "*")
 public class UsuarioController {
-    private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
     private final UsuarioService usuarioService;
     private final UsuarioAssembler usuarioAssembler;
 
@@ -30,21 +26,13 @@ public class UsuarioController {
     public UsuarioController(UsuarioService usuarioService, UsuarioAssembler usuarioAssembler) {
         this.usuarioService = usuarioService;
         this.usuarioAssembler = usuarioAssembler;
-        logger.info("UsuarioController inicializado");
-    }
-
-    @PostConstruct
-    public void init() {
-        logger.info("UsuarioController registrado en el contexto de Spring");
     }
 
     @GetMapping
     public CollectionModel<EntityModel<Usuario>> getAllUsuarios() {
-        logger.info("Obteniendo todos los usuarios");
         List<EntityModel<Usuario>> usuarios = usuarioService.findAll().stream()
                 .map(usuarioAssembler::toModel)
                 .collect(Collectors.toList());
-        logger.info("Se encontraron {} usuarios", usuarios.size());
         
         return CollectionModel.of(usuarios,
                 linkTo(methodOn(UsuarioController.class).getAllUsuarios()).withSelfRel());
@@ -68,31 +56,19 @@ public class UsuarioController {
 
     @PostMapping
     public ResponseEntity<EntityModel<Usuario>> createUsuario(@RequestBody Usuario usuario) {
-        try {
-            Usuario savedUsuario = usuarioService.save(usuario);
-            return ResponseEntity.ok(usuarioAssembler.toModel(savedUsuario));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        Usuario savedUsuario = usuarioService.save(usuario);
+        return ResponseEntity.ok(usuarioAssembler.toModel(savedUsuario));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<EntityModel<Usuario>> updateUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
-        try {
-            Usuario updatedUsuario = usuarioService.update(id, usuario);
-            return ResponseEntity.ok(usuarioAssembler.toModel(updatedUsuario));
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        Usuario updatedUsuario = usuarioService.update(id, usuario);
+        return ResponseEntity.ok(usuarioAssembler.toModel(updatedUsuario));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUsuario(@PathVariable Long id) {
-        try {
-            usuarioService.deleteById(id);
-            return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        usuarioService.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 } 

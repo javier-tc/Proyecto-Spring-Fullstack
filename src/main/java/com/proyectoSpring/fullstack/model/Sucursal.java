@@ -14,6 +14,9 @@ public class Sucursal {
     @Column(nullable = false)
     private String nombre;
 
+    @Column(columnDefinition = "TEXT")
+    private String descripcion;
+
     @Column(nullable = false)
     private String direccion;
 
@@ -23,8 +26,21 @@ public class Sucursal {
     @Column(nullable = false)
     private String telefono;
 
-    @Column(nullable = false)
+    @Column
     private String email;
 
+    @Column(nullable = false)
     private boolean activa = true;
+
+    @Column(name = "horario_apertura")
+    private String horarioApertura;
+
+    @Column(name = "horario_cierre")
+    private String horarioCierre;
+
+    public Sucursal() {}
+
+    public Sucursal(Long id) {
+        this.id = id;
+    }
 } 

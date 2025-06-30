@@ -5,7 +5,7 @@ import com.proyectoSpring.fullstack.repository.NotificacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,21 +30,28 @@ public class NotificacionService {
         return notificacionRepository.findByUsuarioId(usuarioId);
     }
 
+    public List<Notificacion> findNoLeidasByUsuarioId(Long usuarioId) {
+        return notificacionRepository.findByUsuarioIdAndLeidaFalse(usuarioId);
+    }
+
+    public List<Notificacion> findByTipo(String tipo) {
+        return notificacionRepository.findByTipoAndActivaTrue(tipo);
+    }
+
     public Notificacion save(Notificacion notificacion) {
         return notificacionRepository.save(notificacion);
     }
 
-    public void deleteById(Long id) {
-        notificacionRepository.deleteById(id);
+    public Optional<Notificacion> marcarComoLeida(Long id) {
+        return notificacionRepository.findById(id)
+                .map(notificacion -> {
+                    notificacion.setLeida(true);
+                    notificacion.setFechaLectura(LocalDateTime.now());
+                    return notificacionRepository.save(notificacion);
+                });
     }
 
-    // Marca una notificación como leída.
-
-    @Transactional
-    public void marcarComoLeida(Long notificacionId) {
-        notificacionRepository.findById(notificacionId).ifPresent(notificacion -> {
-            notificacion.marcarComoLeido();
-            notificacionRepository.save(notificacion);
-        });
+    public void deleteById(Long id) {
+        notificacionRepository.deleteById(id);
     }
 }

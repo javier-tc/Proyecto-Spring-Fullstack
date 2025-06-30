@@ -16,21 +16,30 @@ public class Reporte {
     @Column(nullable = false)
     private TipoReporte tipo;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
-    private Usuario generadoPor;
-
-    @Column(nullable = false)
+    @Column(name = "fecha_generacion", nullable = false)
     private LocalDateTime fechaGeneracion;
 
-    @Column
-    private String rutaArchivo;
+    @ManyToOne
+    @JoinColumn(name = "generado_por_id")
+    private Usuario generadoPor;
 
-    @Column
-    private String formato; // PDF, EXCEL, CSV
+    @Column(name = "parametros", columnDefinition = "TEXT")
+    private String parametros;
 
-    @Column
-    private String parametros; // JSON con parámetros del reporte
+    @Column(name = "resultado", columnDefinition = "TEXT")
+    private String resultado;
+
+    @Column(name = "estado", nullable = false)
+    private String estado = "GENERADO";
+
+    @Column(name = "formato")
+    private String formato;
+
+    @Column(name = "tamaño_archivo")
+    private Long tamañoArchivo;
+
+    @Column(name = "url_descarga")
+    private String urlDescarga;
 
     @PrePersist
     protected void onCreate() {

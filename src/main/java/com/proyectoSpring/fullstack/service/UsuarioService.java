@@ -56,9 +56,11 @@ public class UsuarioService {
             }
 
             // Encriptar contraseña si es un nuevo usuario o si se cambió
-            if (usuario.getId() == null || !usuario.getPassword().startsWith("$2a$")) {
+            if (usuario.getId() == null || (usuario.getPassword() != null && !usuario.getPassword().startsWith("$2a$"))) {
                 logger.debug("Encriptando contraseña para usuario: {}", usuario.getEmail());
-                usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+                if (usuario.getPassword() != null) {
+                    usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+                }
             }
 
             // Si no se especifican roles, asignar rol CLIENTE por defecto
@@ -113,10 +115,10 @@ public class UsuarioService {
                     usuarioActualizado.setBloqueado(usuarioExistente.isBloqueado());
 
                     // Si la contraseña no está encriptada, encriptarla
-                    if (!usuarioActualizado.getPassword().startsWith("$2a$")) {
+                    if (usuarioActualizado.getPassword() != null && !usuarioActualizado.getPassword().startsWith("$2a$")) {
                         usuarioActualizado.setPassword(passwordEncoder.encode(usuarioActualizado.getPassword()));
                     } else {
-                        // Si ya está encriptada, mantener la contraseña existente
+                        // Si ya está encriptada o es null, mantener la contraseña existente
                         usuarioActualizado.setPassword(usuarioExistente.getPassword());
                     }
 

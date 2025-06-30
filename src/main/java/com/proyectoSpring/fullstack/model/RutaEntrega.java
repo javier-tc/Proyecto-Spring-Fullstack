@@ -62,12 +62,4 @@ public class RutaEntrega {
     protected void onCreate() {
         estado = EstadoRuta.PLANIFICADA;
     }
-}
-
-enum EstadoRuta {
-    PLANIFICADA,
-    EN_PROGRESO,
-    COMPLETADA,
-    CANCELADA,
-    RETRASADA
 } 

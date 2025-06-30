@@ -11,4 +11,7 @@ import java.util.List;
 public interface ReporteRepository extends JpaRepository<Reporte, Long> {
     // Buscar reportes por tipo
     List<Reporte> findByTipo(TipoReporte tipo);
+    
+    // Buscar reportes por usuario que los generó
+    List<Reporte> findByGeneradoPorId(Long usuarioId);
 }

@@ -1,12 +1,10 @@
 package com.proyectoSpring.fullstack.model;
 
 public enum MetodoPago {
-    TRANSFERENCIA,
     TARJETA_CREDITO,
     TARJETA_DEBITO,
+    TRANSFERENCIA,
     EFECTIVO,
-    BONO,
-    PUNTOS,
     PAYPAL,
-    WEBPAY
+    MERCADOPAGO
 } 

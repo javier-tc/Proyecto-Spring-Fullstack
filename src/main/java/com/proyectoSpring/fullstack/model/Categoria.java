@@ -14,7 +14,12 @@ public class Categoria {
     @Column(nullable = false, unique = true)
     private String nombre;
 
+    @Column(columnDefinition = "TEXT")
     private String descripcion;
 
-    private boolean activo = true;
+    @Column(nullable = false)
+    private boolean activa = true;
+
+    @Column(name = "imagen_url")
+    private String imagenUrl;
 } 

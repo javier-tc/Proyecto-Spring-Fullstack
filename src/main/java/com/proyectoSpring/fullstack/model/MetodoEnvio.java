@@ -12,16 +12,17 @@ public class MetodoEnvio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String nombre;
 
+    @Column(columnDefinition = "TEXT")
     private String descripcion;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal costo;
+    @Column(name = "costo_base", nullable = false, precision = 10, scale = 2)
+    private BigDecimal costoBase;
 
-    @Column(name = "tiempo_estimado", nullable = false)
-    private Integer tiempoEstimado;
+    @Column(name = "tiempo_estimado")
+    private String tiempoEstimado;
 
     @Column(nullable = false)
     private boolean activo = true;

@@ -12,31 +12,34 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String nombre;
-
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String codigo;
 
     @Column(nullable = false)
+    private String nombre;
+
+    @Column(columnDefinition = "TEXT")
     private String descripcion;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal precio;
 
     @Column(nullable = false)
-    private Integer stock;
-
-    @Column(nullable = false)
-    private Integer stockMinimo;
+    private Integer stock = 0;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
 
-    @ManyToOne
-    @JoinColumn(name = "sucursal_id")
-    private Sucursal sucursal;
-
+    @Column(nullable = false)
     private boolean activo = true;
+
+    @Column(name = "imagen_url")
+    private String imagenUrl;
+
+    @Column(name = "stock_minimo")
+    private Integer stockMinimo = 0;
+
+    @Column(name = "stock_maximo")
+    private Integer stockMaximo = 1000;
 } 

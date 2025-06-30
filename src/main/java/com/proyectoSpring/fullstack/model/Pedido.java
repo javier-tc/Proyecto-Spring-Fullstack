@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Entity
@@ -23,57 +22,47 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
+
+    @Column(name = "numero_pedido", nullable = false, unique = true)
     private String numeroPedido;
 
-    @ManyToOne
-    @JoinColumn(name = "cliente_id")
-    private Usuario cliente;
+    @Column(name = "fecha_pedido", nullable = false)
+    private LocalDateTime fechaPedido;
 
-    @Column(nullable = false)
-    private LocalDateTime fechaCreacion;
-
-    @Column(nullable = false)
+    @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "estado", nullable = false)
     private EstadoPedido estado;
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
-    private List<DetallePedido> detalles;
-
-    @Column(nullable = false)
+    @Column(name = "total", nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
 
-    @ManyToOne
-    @JoinColumn(name = "sucursal_id")
-    private Sucursal sucursal;
+    @Column(name = "direccion_entrega", nullable = false)
+    private String direccionEntrega;
+
+    @Column(name = "observaciones")
+    private String observaciones;
 
     @ManyToOne
     @JoinColumn(name = "ruta_id")
     private RutaEntrega ruta;
 
-    private String observaciones;
-
     @PrePersist
     protected void onCreate() {
-        fechaCreacion = LocalDateTime.now();
+        fechaPedido = LocalDateTime.now();
         fechaActualizacion = LocalDateTime.now();
-        estado = EstadoPedido.PENDIENTE;
+        if (estado == null) {
+            estado = EstadoPedido.PENDIENTE;
+        }
     }
 
     @PreUpdate
     protected void onUpdate() {
         fechaActualizacion = LocalDateTime.now();
     }
-}
-
-enum EstadoPedido {
-    PENDIENTE,
-    CONFIRMADO,
-    EN_PREPARACION,
-    ENVIADO,
-    ENTREGADO,
-    CANCELADO
 } 

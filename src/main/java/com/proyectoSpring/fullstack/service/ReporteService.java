@@ -6,6 +6,7 @@ import com.proyectoSpring.fullstack.repository.ReporteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,11 +27,42 @@ public class ReporteService {
         return reporteRepository.findById(id);
     }
 
-    public List<Reporte> getReportesByTipo(TipoReporte tipo) {
-        return reporteRepository.findByTipo(tipo);
+    public List<Reporte> findByTipo(String tipo) {
+        return reporteRepository.findByTipo(TipoReporte.valueOf(tipo.toUpperCase()));
+    }
+
+    public List<Reporte> findByUsuarioId(Long usuarioId) {
+        return reporteRepository.findByGeneradoPorId(usuarioId);
     }
 
     public Reporte save(Reporte reporte) {
+        return reporteRepository.save(reporte);
+    }
+
+    public Reporte generarReporte(Reporte reporte) {
+        reporte.setFechaGeneracion(LocalDateTime.now());
+        return reporteRepository.save(reporte);
+    }
+
+    public Reporte generarEstadisticasVentas(LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+        Reporte reporte = new Reporte();
+        reporte.setTipo(TipoReporte.VENTAS);
+        reporte.setFechaGeneracion(LocalDateTime.now());
+        reporte.setParametros("{\"fechaInicio\":\"" + fechaInicio + "\",\"fechaFin\":\"" + fechaFin + "\"}");
+        return reporteRepository.save(reporte);
+    }
+
+    public Reporte generarEstadisticasInventario() {
+        Reporte reporte = new Reporte();
+        reporte.setTipo(TipoReporte.INVENTARIO);
+        reporte.setFechaGeneracion(LocalDateTime.now());
+        return reporteRepository.save(reporte);
+    }
+
+    public Reporte generarEstadisticasUsuarios() {
+        Reporte reporte = new Reporte();
+        reporte.setTipo(TipoReporte.USUARIOS);
+        reporte.setFechaGeneracion(LocalDateTime.now());
         return reporteRepository.save(reporte);
     }
 

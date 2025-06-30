@@ -5,28 +5,31 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "inventarios")
+@Table(name = "inventario")
 public class Inventario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "sucursal_id", nullable = false)
-    private Sucursal sucursal;
-
-    @ManyToOne
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
+
+    @ManyToOne
+    @JoinColumn(name = "sucursal_id", nullable = false)
+    private Sucursal sucursal;
 
     @Column(nullable = false)
     private Integer cantidad;
 
-    @Column(nullable = false)
+    @Column(name = "stock_minimo", nullable = false)
     private Integer stockMinimo;
 
-    @Column(nullable = false)
+    @Column(name = "stock_maximo", nullable = false)
     private Integer stockMaximo;
+
+    @Column(nullable = false)
+    private boolean activo = true;
 
     public void ajustarStock(Integer cantidad) {
         this.cantidad += cantidad;
