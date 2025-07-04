@@ -24,9 +24,18 @@ import java.util.stream.Collectors;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.Parameter;
+
 @RestController
 @RequestMapping("/api/inventario")
 @CrossOrigin(origins = "*")
+@Tag(name = "Inventario", description = "Gestión del inventario de productos")
 public class InventarioController {
 
     private static final Logger logger = LoggerFactory.getLogger(InventarioController.class);
@@ -49,6 +58,21 @@ public class InventarioController {
     private final Long dummySucursalId = 1L;
 
     @GetMapping("/sucursal")
+    @Operation(
+        summary = "Obtener inventario de sucursal",
+        description = "Retorna el inventario completo de una sucursal específica"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Inventario obtenido exitosamente",
+            content = @Content(schema = @Schema(implementation = CollectionModel.class))
+        ),
+        @ApiResponse(
+            responseCode = "500", 
+            description = "Error interno del servidor"
+        )
+    })
     public CollectionModel<EntityModel<Inventario>> getInventarioDummySucursal() {
         List<EntityModel<Inventario>> inventarios = inventarioService.findBySucursalId(dummySucursalId).stream()
                 .map(inventarioAssembler::toModel)
@@ -59,7 +83,28 @@ public class InventarioController {
     }
 
     @PostMapping
-    public ResponseEntity<EntityModel<Inventario>> crearProductoEnInventario(@Valid @RequestBody InventarioRequest request) {
+    @Operation(
+        summary = "Crear producto en inventario",
+        description = "Crea un nuevo producto y lo agrega al inventario de la sucursal"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Producto creado en inventario exitosamente",
+            content = @Content(schema = @Schema(implementation = EntityModel.class))
+        ),
+        @ApiResponse(
+            responseCode = "400", 
+            description = "Datos de entrada inválidos o categoría no encontrada"
+        ),
+        @ApiResponse(
+            responseCode = "500", 
+            description = "Error interno del servidor"
+        )
+    })
+    public ResponseEntity<EntityModel<Inventario>> crearProductoEnInventario(
+            @Parameter(description = "Datos del producto a crear en inventario", required = true) 
+            @Valid @RequestBody InventarioRequest request) {
         try {
             // Crear o actualizar el producto
             Producto producto = productoService.findByCodigo(request.getCodigo())
@@ -102,9 +147,28 @@ public class InventarioController {
     }
 
     @PutMapping("/{inventarioId}")
+    @Operation(
+        summary = "Actualizar inventario",
+        description = "Actualiza la información de un producto en el inventario"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Inventario actualizado exitosamente",
+            content = @Content(schema = @Schema(implementation = EntityModel.class))
+        ),
+        @ApiResponse(
+            responseCode = "400", 
+            description = "Datos de entrada inválidos o inventario no encontrado"
+        ),
+        @ApiResponse(
+            responseCode = "404", 
+            description = "Inventario no encontrado"
+        )
+    })
     public ResponseEntity<EntityModel<Inventario>> actualizarInventario(
-            @PathVariable Long inventarioId,
-            @Valid @RequestBody InventarioRequest request) {
+            @Parameter(description = "ID del inventario a actualizar", required = true) @PathVariable Long inventarioId,
+            @Parameter(description = "Datos actualizados del inventario", required = true) @Valid @RequestBody InventarioRequest request) {
         try {
             Inventario inventario = inventarioService.findById(inventarioId)
                     .orElseThrow(() -> new RuntimeException("Inventario no encontrado"));
@@ -132,7 +196,26 @@ public class InventarioController {
     }
 
     @DeleteMapping("/{inventarioId}")
-    public ResponseEntity<Void> eliminarInventario(@PathVariable Long inventarioId) {
+    @Operation(
+        summary = "Eliminar producto del inventario",
+        description = "Elimina un producto del inventario y lo marca como inactivo"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200", 
+            description = "Producto eliminado del inventario exitosamente"
+        ),
+        @ApiResponse(
+            responseCode = "400", 
+            description = "Error al eliminar el inventario"
+        ),
+        @ApiResponse(
+            responseCode = "404", 
+            description = "Inventario no encontrado"
+        )
+    })
+    public ResponseEntity<Void> eliminarInventario(
+            @Parameter(description = "ID del inventario a eliminar", required = true) @PathVariable Long inventarioId) {
         try {
             Inventario inventario = inventarioService.findById(inventarioId)
                     .orElseThrow(() -> new RuntimeException("Inventario no encontrado"));
